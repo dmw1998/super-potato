@@ -34,21 +34,24 @@ def diffusion(a, n_grid):
 if __name__ == '__main__':
     import numpy as np
     import matplotlib.pyplot as plt
+    u_max = 0.535
     N = 100
     a = np.random.lognormal(1, 0.1, N)
     n_grid = 10
     P = np.zeros(N)
-    # fig = plt.figure()
-    # ax = plt.subplot()
-    # ax.set_xlabel('x')
-    # ax.set_ylabel('u')
-    # ax.grid()
+    fig = plt.figure()
+    ax = plt.subplot()
+    ax.set_xlabel('x')
+    ax.set_ylabel('u')
+    ax.grid()
     for i in range(N):
         u = diffusion(a[i], n_grid)
         # failure: u_h(1) > 0.535
         P[i] = u(1)
-        # plot(u, label='a = %f' % a[i])
+        plot(u, label='a = %f' % a[i])
         
-    # plt.legend()
-    # plt.show()
-    # print(np.mean(P>0.535))
+    # Plot u_max
+    ax.axhline(y=u_max, color='r', linestyle='--', label='u_max')
+    plt.ylim(0, u_max+0.05)
+    plt.show()
+    print(np.mean(P>u_max))
