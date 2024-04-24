@@ -49,7 +49,7 @@ if __name__ == '__main__':
     gamma = 0.5
     c_min = 0.0
     c_max = 1.0
-    theta =generate_seed() # std Gaussian
+    theta = generate_seed() # std Gaussian
     samples = metropolis_hastings_1d(theta, N, gamma, c_min, c_max)
     plt.hist(samples, bins=50, density=True)
     plt.show()
