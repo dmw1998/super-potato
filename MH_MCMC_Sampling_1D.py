@@ -7,7 +7,7 @@ import numpy as np
 
 # # target distribution
 # def target_distribution(x):
-#     # one dimensional Gaussian distribution
+#     # one-dimensional Gaussian distribution
 #     mu = 0.0
 #     sigma = 1.0
 #     return np.exp(-0.5 * ((x - mu) / sigma)**2) / (sigma * np.sqrt(2 * np.pi))
@@ -23,17 +23,19 @@ def acceptance_condition(theta_c, c_min, c_max):
     return theta_c <= c_max and theta_c >= c_min
 
 def metropolis_hastings_1d(theta, N, gamma, c_min, c_max):
-    samples = [theta]
+    samples = []
+    for theta_1 in theta:
+        samples.append(theta_1)
 
-    for _ in range(1,N):
-        theta_c = proposal_distribution(theta, gamma)
-        
-        acceptance = acceptance_condition(theta_c, c_min, c_max)
-        
-        if acceptance:
-            theta = theta_c
+        for _ in range(1,N):
+            theta_c = proposal_distribution(theta_1, gamma)
+            
+            acceptance = acceptance_condition(theta_c, c_min, c_max)
+            
+            if acceptance:
+                theta_1 = theta_c
 
-        samples.append(theta)
+            samples.append(theta_1)
 
     return np.array(samples)
 
@@ -49,7 +51,8 @@ if __name__ == '__main__':
     gamma = 0.5
     c_min = 0.0
     c_max = 1.0
-    theta =generate_seed() # std Gaussian
+    int_seed = generate_seed() # std Gaussian
+    theta = [int_seed]
     samples = metropolis_hastings_1d(theta, N, gamma, c_min, c_max)
     plt.hist(samples, bins=50, density=True)
     plt.show()
