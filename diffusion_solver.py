@@ -5,12 +5,26 @@ from fenics import *
 from kl_expan import kl_expan
 
 def create_coefficient_function(a_func, V):
+    # input:
+    # a_func: the random field
+    # V: function space
+    
+    # output:
+    # a: coefficient function
+    
     a = Function(V)
     for i, x in enumerate(V.tabulate_dof_coordinates()):
         a.vector()[i] = a_func(x[0])  # Evaluate a_func at mesh coordinates
     return a
 
 def diffusion_solver(a_func, n_grid):
+    # input:
+    # a_func: the random field
+    # n_grid: number of mesh points
+    
+    # output:
+    # u_h(1): approximated IoQ
+    
     # Create the mesh and define function space
     mesh = IntervalMesh(n_grid, 0, 1)
     V = FunctionSpace(mesh, 'P', 1)
