@@ -16,9 +16,10 @@ def MCMC_sampling_each_theta(G, theta_1, c_l, u_max, gamma = 0.8):
     # theta_new: new state
     
     M = len(theta_1)
-    theta_c = np.zeros_like(theta_1)
-    for i in range(M):
-        theta_c[i] = gamma * theta_1[i] + np.sqrt(1 - gamma**2) * np.random.normal()
+    # theta_c = np.zeros_like(theta_1)
+    # for i in range(M):
+    #     theta_c[i] = gamma * theta_1[i] + np.sqrt(1 - gamma**2) * np.random.normal()
+    theta_c = gamma * theta_1 + np.sqrt(1 - gamma**2) * np.random.randn(M)
         
     u_h = IoQ(kl_expan(theta_c), 4)
     
@@ -63,8 +64,8 @@ from IoQ_and_c_l import *
 class TestMCMCSampling(unittest.TestCase):
     def test_MCMC_sampling(self):
         # Define the parameters for the MCMC_sampling function
-        N = 10
-        M = 1
+        N = 100
+        M = 150
         c_l = 5
         u_max = 0.535
         gamma = 0.8
@@ -72,11 +73,9 @@ class TestMCMCSampling(unittest.TestCase):
         theta_ls = []
         
         # Initial a theta list and corresponding G
-        for i in range(3):
+        for i in range(N):
             thetas = np.random.normal(0, 1, M)
             theta_ls.append(thetas)
-            
-        print(len(theta_ls))
         
         for thetas in theta_ls:
             g = IoQ(kl_expan(thetas), 4) - u_max

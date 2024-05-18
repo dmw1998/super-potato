@@ -17,7 +17,7 @@ def kl_expan(thetas):
         return 1 / ms * np.sin(ms * np.pi * x) * thetas
     
     def a(x):
-        sums = np.sqrt(2) / np.pi * np.sum(terms(x), axis=0)
+        sums = np.sqrt(2) / np.pi * np.sum(terms(x))
         return np.exp(sums)
     
     return np.vectorize(a)
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     # Define the parameters of the lognormal random field
     mu = 0
     sigma = 0.1
-    M = 10000
+    M = 150
     
     # Define the domain of the random field
     x = np.linspace(0, 1, 100)

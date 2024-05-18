@@ -4,10 +4,22 @@
 from fenics import *
 from kl_expan import kl_expan
 
+class Coefficient(UserExpression):
+    def __init__(self, a_func, **kwargs):
+        self.a_func = a_func
+        super().__init__(**kwargs)
+
+    def eval(self, values, x):
+        values[0] = self.a_func(x[0])
+
+    def value_shape(self):
+        return ()
+
 def create_coefficient_function(a_func, V):
     a = Function(V)
-    for i, x in enumerate(V.tabulate_dof_coordinates()):
-        a.vector()[i] = a_func(x[0])  # Evaluate a_func at mesh coordinates
+    dof_coords = V.tabulate_dof_coordinates().flatten()
+    a_vals = np.array([a_func(x) for x in dof_coords])
+    a.vector()[:] = a_vals
     return a
 
 def IoQ(a_func, n_grid):
@@ -23,12 +35,12 @@ def IoQ(a_func, n_grid):
     V = FunctionSpace(mesh, 'P', 1)
 
     # Create coefficient function a(x)
-    a = create_coefficient_function(a_func, V)
+    a = Coefficient(a_func, degree=1)
 
     # Define boundary condition
     u0 = Constant(0.0)
-    def boundary(x):
-        return x[0] < DOLFIN_EPS
+    def boundary(x, on_boundary):
+        return on_boundary and near(x[0], 0, DOLFIN_EPS)
     
     bc = DirichletBC(V, u0, boundary)
 
@@ -55,19 +67,14 @@ def failure_level(G, thetas_ls, N, p0 = 0.1):
     # output:
     # c_l: failure level
     
-    sorted_G = []
-    sorted_theta_ls = []
-    
     sorted_indices = sorted(range(N), key=lambda k: G[k])
-    for i in sorted_indices:
-        sorted_G.append(G[i])
-        sorted_theta_ls.append(thetas_ls[i])
-        
+    sorted_G = [G[i] for i in sorted_indices]
+    sorted_theta_ls = [thetas_ls[i] for i in sorted_indices]
+    
     N0 = int(p0 * N)
-    # Keep the smallest n components and their corresponding thetas
     G = sorted_G[:N0]
     thetas_ls = sorted_theta_ls[:N0]
-    c_l = sorted_G[int(np.ceil(p0 * N))]
+    c_l = sorted_G[N0-1]
     
     return G, thetas_ls, c_l
     
@@ -75,7 +82,7 @@ def failure_level(G, thetas_ls, N, p0 = 0.1):
 if __name__ == '__main__':
     import numpy as np
     u_max = 0.535
-    N = 100
+    N = 1000
     M = 150
     n_grid = 400
     p0 = 0.1
