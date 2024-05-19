@@ -1,7 +1,7 @@
 # MH-type MCMC for sampling from the target distribution \phi(\cdot | F_{\ell - 1}) where \phi denotes the M-variate standard Gaussian PDF and F_{\ell} = {\theta \in \mathbb{R}^{M} : G(\theta) \leq c_{\ell}}
 
 from fenics import *
-from kl_expan import kl_expan
+from kl_expan import kl_expan_2
 import numpy as np
 
 def MCMC_sampling_each_theta(G, theta_1, c_l, u_max, gamma = 0.8):
@@ -21,7 +21,7 @@ def MCMC_sampling_each_theta(G, theta_1, c_l, u_max, gamma = 0.8):
     #     theta_c[i] = gamma * theta_1[i] + np.sqrt(1 - gamma**2) * np.random.normal()
     theta_c = gamma * theta_1 + np.sqrt(1 - gamma**2) * np.random.randn(M)
         
-    u_h = IoQ(kl_expan(theta_c), 4)
+    u_h = IoQ(kl_expan_2(theta_c), 4)
     
     if u_h - u_max <= c_l:
         theta_new = theta_c
