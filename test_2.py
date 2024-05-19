@@ -58,7 +58,6 @@ v = TestFunction(V)
 f = Constant(1.0)
 
 a_u_x = a * u.dx(0)
-a_v_x = a * v.dx(0)
 F = dot(a_u_x, v.dx(0)) * dx - f * v * dx
 
 a_form = lhs(F)

@@ -2,29 +2,67 @@
 # where a is a lognormal random field approximated by KL expansion
 
 from fenics import *
-from kl_expan import kl_expan
+# from kl_expan import kl_expan
+from kl_expan import kl_expan_2
+import numpy as np
 
-class Coefficient(UserExpression):
-    def __init__(self, a_func, **kwargs):
-        self.a_func = a_func
-        super().__init__(**kwargs)
+# class Coefficient(UserExpression):
+#     def __init__(self, a_func, **kwargs):
+#         self.a_func = a_func
+#         super().__init__(**kwargs)
 
-    def eval(self, values, x):
-        values[0] = self.a_func(x[0])
+#     def eval(self, values, x):
+#         values[0] = self.a_func(x[0])
 
-    def value_shape(self):
-        return ()
+#     def value_shape(self):
+#         return ()
 
-def create_coefficient_function(a_func, V):
-    a = Function(V)
-    dof_coords = V.tabulate_dof_coordinates().flatten()
-    a_vals = np.array([a_func(x) for x in dof_coords])
-    a.vector()[:] = a_vals
-    return a
+# def create_coefficient_function(a_func, V):
+#     a = Function(V)
+#     dof_coords = V.tabulate_dof_coordinates().flatten()
+#     a_vals = np.array([a_func(x) for x in dof_coords])
+#     a.vector()[:] = a_vals
+#     return a
 
-def IoQ(a_func, n_grid):
+# def IoQ(a_func, n_grid):
+#     # input:
+#     # a_func: the random field
+#     # n_grid: number of mesh points
+    
+#     # output:
+#     # u_h(1): approximated IoQ
+    
+#     # Create the mesh and define function space
+#     mesh = IntervalMesh(n_grid, 0, 1)
+#     V = FunctionSpace(mesh, 'P', 1)
+
+#     # Create coefficient function a(x)
+#     a = Coefficient(a_func, degree=1)
+
+#     # Define boundary condition
+#     u0 = Constant(0.0)
+#     def boundary(x, on_boundary):
+#         return on_boundary and near(x[0], 0, DOLFIN_EPS)
+    
+#     bc = DirichletBC(V, u0, boundary)
+
+#     # Define variational problem
+#     u = TrialFunction(V)
+#     v = TestFunction(V)
+#     f = Constant(1.0)
+
+#     a_form = inner(a * grad(u), grad(v)) * dx
+#     L = f * v * dx
+
+#     # Compute solution
+#     u_h = Function(V)
+#     solve(a_form == L, u_h, bc)
+
+#     return u_h(1)
+
+def IoQ(a_x, n_grid):
     # input:
-    # a_func: the random field
+    # a_x: the random field
     # n_grid: number of mesh points
     
     # output:
@@ -33,29 +71,31 @@ def IoQ(a_func, n_grid):
     # Create the mesh and define function space
     mesh = IntervalMesh(n_grid, 0, 1)
     V = FunctionSpace(mesh, 'P', 1)
-
-    # Create coefficient function a(x)
-    a = Coefficient(a_func, degree=1)
-
+    
+    # Define the random field a(x) on the FEniCS mesh
+    a = Function(V)
+    a_values = np.interp(mesh.coordinates().flatten(), np.linspace(0, 1, len(a_x)), a_x)
+    a.vector()[:] = a_values
+    
     # Define boundary condition
     u0 = Constant(0.0)
     def boundary(x, on_boundary):
         return on_boundary and near(x[0], 0, DOLFIN_EPS)
     
     bc = DirichletBC(V, u0, boundary)
-
+    
     # Define variational problem
     u = TrialFunction(V)
     v = TestFunction(V)
     f = Constant(1.0)
-
-    a_form = inner(a * grad(u), grad(v)) * dx
+    
+    a_form = inner(a * u.dx(0), v.dx(0)) * dx
     L = f * v * dx
-
+    
     # Compute solution
     u_h = Function(V)
     solve(a_form == L, u_h, bc)
-
+    
     return u_h(1)
 
 # To define the failure domain
@@ -96,14 +136,12 @@ if __name__ == '__main__':
     
     for i in range(N):
         thetas = np.random.normal(0, 1, M)
-        u_1 = IoQ(kl_expan(thetas), n_grid)
-        g = u_1 - u_max
+        u_1 = IoQ(kl_expan_2(thetas), n_grid)
+        g = u_max - u_1
         G[i] = g
         thetas_list[i] = thetas
         
         
     G, thetas, c_l = failure_level(G, thetas_list, N, p0)
     print('c_l =', c_l)
-    print('G =', len(G))
-    print('thetas =', len(thetas))
     print("failure probability:", len(G) / N)

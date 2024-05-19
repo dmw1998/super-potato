@@ -25,7 +25,7 @@ def MCMC_sampling_each_theta(G, theta_1, c_l, u_max, gamma = 0.8):
     
     if u_h - u_max <= c_l:
         theta_new = theta_c
-        G_new = (u_h - u_max)
+        G_new = (u_max - u_h)
     else:
         theta_new = theta_1
         G_new = G[-1]
@@ -78,7 +78,7 @@ class TestMCMCSampling(unittest.TestCase):
             theta_ls.append(thetas)
         
         for thetas in theta_ls:
-            g = IoQ(kl_expan(thetas), 4) - u_max
+            g = u_max - IoQ(kl_expan_2(thetas), 4)
             G.append(g)
 
         # Call the MCMC_sampling function
