@@ -5,7 +5,7 @@ from scipy.linalg import circulant
 from matplotlib.pyplot import axhline
 import scipy.sparse as sp
 
-def generate_lognormal_field(length, num_points, l_c, mean=0, std_dev=0.1):
+def generate_lognormal_field(length, num_points, l_c, mean=1, std_dev=0.1):
     """Generate a lognormal random field."""
     x = np.linspace(0, length, num_points)
     dx = x[1] - x[0]
@@ -45,7 +45,7 @@ def solve_bvp_fenics(a_field, length, num_points):
 length = 1.0
 num_points = 150
 l_c = 0.01
-num_realizations = 10000
+num_realizations = 1
 u_max = 0.535
 u_1 = []
 
