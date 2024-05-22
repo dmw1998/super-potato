@@ -21,12 +21,16 @@ def MCMC_sampling_each_theta(G, theta_1, c_l, u_max, gamma = 0.8):
     #     theta_c[i] = gamma * theta_1[i] + np.sqrt(1 - gamma**2) * np.random.normal()
     theta_c = gamma * theta_1 + np.sqrt(1 - gamma**2) * np.random.randn(M)
         
+    # Solve the PDE for a fixed mesh size
     u_h = IoQ(kl_expan_2(theta_c), 100)
     
+    # Acceptance condition
     if u_h - u_max <= c_l:
+        # If theta_c in F_{l-1}, then accept theta_c
         theta_new = theta_c
         G_new = (u_max - u_h)
     else:
+        # If theta_c not in F_{l-1}, then reject theta_c
         theta_new = theta_1
         G_new = G[-1]
     
@@ -79,6 +83,7 @@ def MCMC_sampling_burn_in(L_b, N, G, theta_ls, c_l, u_max, gamma = 0.8):
         theta_ls.append(theta_new)
         i += 1
         
+    # Burn-in the first L_b samples for each Markov chain
     G = G[L_b * N0:]
     theta_ls = theta_ls[L_b * N0:]
     
@@ -92,7 +97,7 @@ from IoQ_and_c_l import *
 class TestMCMCSampling(unittest.TestCase):
     def test_MCMC_sampling(self):
         # Define the parameters for the MCMC_sampling function
-        N = 100
+        N = 1000 
         M = 150
         c_l = 5
         u_max = 0.535
@@ -110,7 +115,11 @@ class TestMCMCSampling(unittest.TestCase):
             G.append(g)
 
         # Call the MCMC_sampling function
-        G, thetas_list = MCMC_sampling(N, G, theta_ls, c_l, u_max, gamma)
+        # G, thetas_list = MCMC_sampling(N, G, theta_ls, c_l, u_max, gamma)
+        
+        # Call the MCMC_sampling_burn_in function
+        L_b = 10
+        G, thetas_list = MCMC_sampling_burn_in(L_b, N, G, theta_ls, u_max, c_l, gamma)
 
         # Check that the results is a list
         self.assertIsInstance(G, list)

@@ -48,17 +48,16 @@ def MCMC_sampling_sr(N, G, theta_ls, l, c_l, u_max, n_grid = 1, gamma = 0.8):
         theta = theta_ls[i]
         theta_new = gamma * theta + np.sqrt(1 - gamma**2) * np.random.randn(M)
         G_new = selective_refinement(l, theta_new, u_max, c_l, n_grid = n_grid)
-        print('G_new =', G_new)
         
         if G_new <= c_l:
             G.append(G_new)
             theta_ls.append(theta_new)
-            i += 1
+            # i += 1
         else:
             G.append(G[i])
             theta_ls.append(theta)
             
-        # i += 1
+        i += 1
     
     return G, theta_ls
 
@@ -66,11 +65,17 @@ def MCMC_sampling_sr(N, G, theta_ls, l, c_l, u_max, n_grid = 1, gamma = 0.8):
 if __name__ == '__main__':
     u_max = 0.535
     l = 5
+    N = 10
     M = 150
-    c_l = 0.3
+    c_l = 0.4
     
-    thetas = np.random.normal(0, 1, M)
+    for i in range(N):
+        thetas = np.random.normal(0, 1, M)
+        
+        G = selective_refinement(l, thetas, u_max, c_l)
+        
+        print('G =', G)
     
-    G = selective_refinement(l, thetas, u_max, c_l)
+    G, thetas = MCMC_sampling_sr(N, [G], [thetas], l, c_l, u_max)
     
     print('G =', G)
