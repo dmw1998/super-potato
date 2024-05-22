@@ -24,7 +24,7 @@ def mle(p0, M, N, L_b, u_max = 0.535, n_grid = 4, L = 6):
     
     # Determine the threshold value c_l
     G, theta_ls, c_l = failure_level(G, theta_ls, N, 0, p0 = p0, L = L)
-    print('c_0 = ', c_l)
+    print('c_1 = ', c_l)
     print('G =', len(G))
     
     # Stop if the threshold value is negative
@@ -34,39 +34,56 @@ def mle(p0, M, N, L_b, u_max = 0.535, n_grid = 4, L = 6):
         denominator = 1
         
     # l < 3, set L_b = 0
-    c_l_1 = c_l
-    G, theta_ls = MCMC_sampling(N, G, theta_ls, u_max, c_l, gamma = 0.8)
+    c_l_1 = c_l    # c_{l-1}
+    # Sampling without burn-in
+    G, theta_ls = MCMC_sampling_burn_in(0, N, G, theta_ls, u_max, c_l_1, gamma = 0.8)
+    
+    # Determine the threshold value c_l s.t. P_{l|l-1} = p0
     G, theta_ls, c_l = failure_level(G, theta_ls, N, 1, p0 = p0, L = L)
-    print('c_1 = ', c_l)
+    print('c_2 = ', c_l)
     print('G =', len(G))
+        
+    if c_l < 0:
+        # Stop if the threshold value is negative (reach the finest level)
+        print('denominator =', denominator)
+        return p0 ** l * len(G) / N / denominator
+    
+    # Sampling without burn-in in level l = 1
     G, theta_ls = MCMC_sampling_burn_in(0, N, G, theta_ls, u_max, c_l, gamma = 0.8)
     
+    # Eveluate P_{l-1|l}: the probability of G <= c_{l-1} (given G <= c_{l})
     G_in_l_1 = [g for g in G if g <= c_l_1]
     print('G_in_l_1 =', len(G_in_l_1))
     denominator *= len(G_in_l_1) / N
     
     # 2 < l < L, set L_b = L_b
     for l in range(2, L-1):
-        c_l_1 = c_l
-        G, theta_ls = MCMC_sampling(N, G, theta_ls, u_max, c_l, gamma = 0.8)
+        c_l_1 = c_l     # c_{l-1}
+        # Sampling with burn-in
+        G, theta_ls = MCMC_sampling_burn_in(L_b, N, G, theta_ls, u_max, c_l_1, gamma = 0.8)
+        
+        # Determine the threshold value c_l s.t. P_{l|l-1} = p0
         G, theta_ls, c_l = failure_level(G, theta_ls, N, l, p0 = p0, L = L)
-        print('c_', l, ' = ', c_l)
+        print('c_', l+1, '= ', c_l)
         print('G =', len(G))
         
         if c_l < 0:
+            # Stop if the threshold value is negative (reach the finest level)
             print('denominator =', denominator)
             return p0 ** l * len(G) / N / denominator
         
+        # Sampling with burn-in in level l
         G, theta_ls = MCMC_sampling_burn_in(L_b, N, G, theta_ls, u_max, c_l, gamma = 0.8)
         
+        # Eveluate P_{l-1|l}: the probability of G <= c_{l-1} (given G <= c_{l})
         G_in_l_1 = [g for g in G if g <= c_l_1]
-        denominator *= len(G_in_l_1) / N
+        denominator *= len(G_in_l_1) / N    # * P_{l-1|l}
         
     # l = L (in program, l = L - 1)
-    G, theta_ls = MCMC_sampling(N, G, theta_ls, u_max, c_l, gamma = 0.8)
+    G, theta_ls = MCMC_sampling_burn_in(L_b, N, G, theta_ls, u_max, c_l, gamma = 0.8)
     G, theta_ls, c_l = failure_level(G, theta_ls, N, L, p0 = p0, L = L)
     print('c_', L, ' = ', c_l)
-    P_L_L_1 = len(G) / N
+    P_L_L_1 = len(G) / N    # P_{L|L-1}
     
     p_f = p0 ** L * P_L_L_1 / denominator
     
