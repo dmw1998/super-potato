@@ -94,4 +94,4 @@ if __name__ == '__main__':
     M = 150
     N = 100
     L_b = 10
-    print(mle(p0, M, N, n_grid = 64, L_b = 10))
+    print(mle(p0, M, N, L_b, n_grid = 64))
