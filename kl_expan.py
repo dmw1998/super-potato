@@ -41,8 +41,12 @@ def kl_expan_2(thetas):
     def eigenfunction(m, x):
         return np.sin((m + 0.5) * np.pi * x)
     
+    # Compute the mean and standard deviation
+    mu = -0.5 * np.log(1.01)
+    sigma = np.sqrt(np.log(1.01))
+    
     # Compute the log-normal random field log(a(x))
-    log_a_x = 1.0 + 0.1 * sum(np.sqrt(eigenvalue(m)) * eigenfunction(m, x) * thetas[m] for m in range(M))
+    log_a_x = mu + sigma * sum(np.sqrt(eigenvalue(m)) * eigenfunction(m, x) * thetas[m] for m in range(M))
 
     # Convert to the actual random field a(x)
     a_x = np.exp(log_a_x)
@@ -145,38 +149,45 @@ if __name__ == '__main__':
     import scipy.stats as stats
     
     # Define the parameters of the lognormal random field
-    mu = 0
-    sigma = 0.1
-    M = 150
+    M = 10
     
     # Define the domain of the random field
     x = np.linspace(0, 1, 100)
     
-    # Define the KL expansion coefficients
-    thetas = np.random.normal(0, 1, M)
-    
-    # Compute the KL expansion
-    a = kl_expan_2(thetas)
-    
-    # Define lognormal parameters
-    mean_ln = 1
-    std_ln = 0.1
-
-    # Perform Kolmogorov-Smirnov Test
-    ks_stat, ks_pvalue = stats.kstest(a, 'lognorm', args=(std_ln,), alternative='two-sided')
-    print(f"Kolmogorov-Smirnov Test: Statistic={ks_stat}, p-value={ks_pvalue}")
-
-    # Histogram plot
     plt.figure(figsize=(8, 6))
-    plt.hist(a, bins=30, density=True, alpha=0.6, color='g')
+    
+    for M in range(1,10):
+        # Define the KL expansion coefficients
+        thetas = np.random.normal(0, 1, M)
+        
+        # Compute the KL expansion
+        a = kl_expan_2(thetas)
+        
+        # Plot the random field
+        # plt.figure(figsize=(8, 6))
+        # plt.plot(x, a, 'g', label='Lognormal Random Field')
+        plt.plot(x, a, alpha=0.8, label=f'M={M}')
 
-    # Plot lognormal PDF for comparison
-    x = np.linspace(0, 3, 1000)
-    pdf_ln = stats.lognorm.pdf(x, std_ln, scale=np.exp(mean_ln))
-    plt.plot(x, pdf_ln, 'r-', label='Lognormal PDF')
+    # # Define lognormal parameters
+    # mean_ln = 1
+    # std_ln = 0.1
+
+    # # Perform Kolmogorov-Smirnov Test
+    # ks_stat, ks_pvalue = stats.kstest(a, 'lognorm', args=(std_ln,), alternative='two-sided')
+    # print(f"Kolmogorov-Smirnov Test: Statistic={ks_stat}, p-value={ks_pvalue}")
+
+    # # Histogram plot
+    # plt.figure(figsize=(8, 6))
+    # plt.hist(a, bins=30, density=True, alpha=0.6, color='g')
+
+    # # Plot lognormal PDF for comparison
+    # x = np.linspace(0, 3, 1000)
+    # pdf_ln = stats.lognorm.pdf(x, std_ln, scale=np.exp(mean_ln))
+    # plt.plot(x, pdf_ln, 'r-', label='Lognormal PDF')
+    # plt.legend()
+
+    # # Q-Q plot
+    # plt.figure(figsize=(6, 6))
+    # stats.probplot(a, dist="lognorm", sparams=(std_ln,), plot=plt)
     plt.legend()
-
-    # Q-Q plot
-    plt.figure(figsize=(6, 6))
-    stats.probplot(a, dist="lognorm", sparams=(std_ln,), plot=plt)
     plt.show()

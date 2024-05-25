@@ -44,7 +44,7 @@ def solve_bvp_fenics(a_field, length, num_points):
 # Parameters
 length = 1.0
 num_points = 150
-l_c = 0.01
+l_c = 0.1
 num_realizations = 1
 u_max = 0.535
 u_1 = []
@@ -55,7 +55,7 @@ plt.figure(figsize=(12, 6))
 for _ in range(num_realizations):
     x, lognormal_field = generate_lognormal_field(length, num_points, l_c)
     plt.subplot(2, 1, 1)
-    plt.plot(x, lognormal_field, alpha=0.1)
+    plt.plot(x, lognormal_field, alpha=0.8)
     
     u_sol = solve_bvp_fenics(lognormal_field, length, num_points)
     u_1.append(u_sol(1) - u_max)
@@ -65,7 +65,7 @@ for _ in range(num_realizations):
     x_values = np.linspace(0, length, len(u_values))
     
     plt.subplot(2, 1, 2)
-    plt.plot(x_values, u_values, alpha=0.1)
+    plt.plot(x_values, u_values, alpha=0.8)
 
 plt.subplot(2, 1, 1)
 plt.title("Lognormal Random Field Realizations")

@@ -89,7 +89,8 @@ def IoQ(a_x, n_grid):
     v = TestFunction(V)
     f = Constant(1.0)
     
-    a_form = inner(a * u.dx(0), v.dx(0)) * dx
+    # a_form = inner(a * u.dx(0), v.dx(0)) * dx
+    a_form = inner(a * grad(u), grad(v)) * dx
     L = f * v * dx
     
     # Set PETSc options to suppress solver output

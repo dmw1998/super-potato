@@ -16,16 +16,16 @@ def MCMC_sampling_each_theta(G, theta_1, c_l, u_max, gamma = 0.8):
     # theta_new: new state
     
     M = len(theta_1)
-    # theta_c = np.zeros_like(theta_1)
-    # for i in range(M):
-    #     theta_c[i] = gamma * theta_1[i] + np.sqrt(1 - gamma**2) * np.random.normal()
-    theta_c = gamma * theta_1 + np.sqrt(1 - gamma**2) * np.random.randn(M)
+    theta_c = np.zeros_like(theta_1)
+    for i in range(M):
+        theta_c[i] = gamma * theta_1[i] + np.sqrt(1 - gamma**2) * np.random.normal()
+    # theta_c = gamma * theta_1 + np.sqrt(1 - gamma**2) * np.random.randn(M)
         
     # Solve the PDE for a fixed mesh size
     u_h = IoQ(kl_expan_2(theta_c), 100)
     
     # Acceptance condition
-    if u_h - u_max <= c_l:
+    if u_max - u_h <= c_l:
         # If theta_c in F_{l-1}, then accept theta_c
         theta_new = theta_c
         G_new = (u_max - u_h)

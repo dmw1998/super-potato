@@ -22,6 +22,10 @@ def eigenfunction(m, x):
 # Generate standard Gaussian random variables theta_m
 theta_m = np.random.normal(0, 1, M)
 
+# Compute the mean and standard deviation
+mu = -0.5 * np.log(1.01)
+sigma = np.sqrt(np.log(1.01))
+
 # Compute the log-normal random field log(a(x))
 log_a_x = mu + sigma * sum(np.sqrt(eigenvalue(m)) * eigenfunction(m, x) * theta_m[m] for m in range(M))
 

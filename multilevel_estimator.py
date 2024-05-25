@@ -46,7 +46,7 @@ def mle(p0, M, N, L_b, u_max = 0.535, n_grid = 4, L = 6):
     if c_l < 0:
         # Stop if the threshold value is negative (reach the finest level)
         print('denominator =', denominator)
-        return p0 ** l * len(G) / N / denominator
+        return p0 * len(G) / N / denominator
     
     # Sampling without burn-in in level l = 1
     G, theta_ls = MCMC_sampling_burn_in(0, N, G, theta_ls, u_max, c_l, gamma = 0.8)

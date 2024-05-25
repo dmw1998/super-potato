@@ -114,7 +114,6 @@ if __name__ == '__main__':
         plt.figure()
         plt.plot(np.linspace(0, 1, n_grid), a_vals, label=f'a(x)_{i+1}')
         plt.legend()
-        plt.show()
         
         u_h = diffusion_solver(a_vals, n_grid)
         u_1 = u_h(1) - u_max
