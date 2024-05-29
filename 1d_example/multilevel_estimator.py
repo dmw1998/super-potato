@@ -1,7 +1,7 @@
 # A multileve estimator with fully refinement for the 1D example
 
 from fenics import *
-from kl_expansion import kl_expan
+from kl_expansion import *
 from IoQ import IoQ
 from mh_sampling import *
 from failure_probability import compute_cl
@@ -72,7 +72,7 @@ def mle(p0, N, M, L_b, u_max = 0.535, n_grid = 4, L = 5):
 
 if __name__ == "__main__":
     p0 = 0.25
-    N = 100
+    N = 1000
     M = 150
     L_b = 10
     u_max = 0.535
