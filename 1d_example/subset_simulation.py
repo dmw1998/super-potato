@@ -85,14 +85,10 @@ if __name__ == "__main__":
     # Define the number of levels
     L = 4
     
-    np.random.seed(0)
-    # Compute the probability of failure
-    p_f = subset_simulation(N, M, p0, u_max, n_grid, gamma, L)
-    print("The probability of failure is: {:.2e}".format(p_f))
-    
-    print("")
-    
-    np.random.seed(1)
-    # Compute the probability of failure
-    p_f = subset_simulation(N, M, p0, u_max, n_grid, gamma, L)
-    print("The probability of failure is: {:.2e}".format(p_f))
+    for i in range(5):
+        np.random.seed(i)
+        # Compute the probability of failure
+        p_f = subset_simulation(N, M, p0, u_max, n_grid, gamma, L)
+        print("The probability of failure is: {:.2e}".format(p_f))
+        
+        print("")
