@@ -91,11 +91,12 @@ if __name__ == "__main__":
     # Define the correlation length
     l_c = 0.01
     
-    M = 1
+    M = 150
     
     # Define the KL coefficients
     np.random.seed(0)
     thetas = np.random.normal(0, 1, M)
+    # thetas = np.ones(M)
     
     # Compute the random field
     a_x = kl_expan(thetas)

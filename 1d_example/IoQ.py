@@ -1,7 +1,7 @@
 # To compute the interests of quantities.
 
 from fenics import *
-from kl_expansion import kl_expan
+from kl_expansion import *
 import numpy as np
 import matplotlib.pyplot as plt
 

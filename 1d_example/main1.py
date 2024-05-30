@@ -48,7 +48,7 @@ def main(L_b, N, M, p0, u_max, n_grid, gamma = 0.8, L = 5):
     # Compute the threshold value
     G, theta_ls, c_l = compute_cl(G, theta_ls, N, p0, 1, L)
     
-    print("Level: 1", "Threshold value: ", c_l)
+    print("Level: 0", "Threshold value: ", c_l)
     
     if c_l < 0:
         p_f_sub = len(G) / N
@@ -61,7 +61,7 @@ def main(L_b, N, M, p0, u_max, n_grid, gamma = 0.8, L = 5):
             # Compute the threshold value
             G, theta_ls, c_l = compute_cl(G, theta_ls, N, p0, l, L)
             
-            print("Level:", l+1, "Threshold value: ", c_l)
+            print("Level:", l, "Threshold value: ", c_l)
             
             if c_l < 0:
                 break
@@ -139,7 +139,6 @@ if __name__ == "__main__":
     
     print("")
     
-    # np.random.seed(1)
     p_f_sub, p_f_mle = main(L_b, N, M, p0, u_max, n_grid)
     print("The probability of failure by subset simulation is: {:.2e}".format(p_f_sub))
     print("The probability of failure by multilevel estimator is: {:.2e}".format(p_f_mle)

@@ -1,7 +1,7 @@
 # Subset simulation with fully refinement
 
 from fenics import *
-from kl_expansion import kl_expan
+from kl_expansion import *
 from mh_sampling import *
 from IoQ import IoQ
 from failure_probability import compute_cl
@@ -34,14 +34,14 @@ def subset_simulation(N, M, p0, u_max, n_grid, gamma = 0.8, L = 5):
     for i in range(N):
         thetas = np.random.normal(0, 1, M)
         theta_ls.append(thetas)
-        u_1 = IoQ(kl_expan(thetas), n_grid)
+        u_1 = IoQ(kl_expan_sus(thetas), n_grid)
         g = u_max - u_1
         G.append(g)
     
     # Compute the threshold value
     G, theta_ls, c_l = compute_cl(G, theta_ls, N, p0, 1, L)
     
-    print("Level: 0", "Threshold value: ", c_l)
+    # print("Level: 0", "Threshold value: ", c_l)
     
     if c_l < 0:
         return len(G) / N
@@ -54,7 +54,7 @@ def subset_simulation(N, M, p0, u_max, n_grid, gamma = 0.8, L = 5):
         # Compute the threshold value
         G, theta_ls, c_l = compute_cl(G, theta_ls, N, p0, l, L)
         
-        print("Level:", l, "Threshold value: ", c_l)
+        # print("Level:", l, "Threshold value: ", c_l)
         
         if c_l < 0:
             break
@@ -65,7 +65,7 @@ def subset_simulation(N, M, p0, u_max, n_grid, gamma = 0.8, L = 5):
 
 if __name__ == "__main__":
     # Define the number of samples
-    N = 1000
+    N = 100
     
     # Define the number of terms in the KL expansion
     M = 150
@@ -85,10 +85,23 @@ if __name__ == "__main__":
     # Define the number of levels
     L = 4
     
-    for i in range(5):
-        np.random.seed(i)
+    # np.random.seed(0)
+    # # Compute the probability of failure
+    # p_f = subset_simulation(N, M, p0, u_max, n_grid, gamma, L)
+    # print("The probability of failure is: {:.2e}".format(p_f))
+    
+    np.random.seed(0)
+    runs = 10
+    p_f = np.zeros(runs)
+    for i in range(0, runs):
+        # print("Seed: ", i)
+        # np.random.seed(i)
         # Compute the probability of failure
-        p_f = subset_simulation(N, M, p0, u_max, n_grid, gamma, L)
-        print("The probability of failure is: {:.2e}".format(p_f))
+        p_f[i] = subset_simulation(N, M, p0, u_max, n_grid, gamma, L)
+        print("The probability of failure is: {:.2e}".format(p_f[i]))
         
-        print("")
+        # print("")
+    
+    # save p_f
+    # np.save("p_f.npy", p_f)
+    print("The mean of the probability of failure is: {:.2e}".format(np.mean(p_f)))

@@ -22,7 +22,21 @@ def sampling_one_new_theta(G, theta_1, c_l, u_max, n_grid, gamma = 0.8):
     M = len(theta_1)
     # theta_c = np.zeros_like(theta_1)
     # for i in range(M):
-    #     theta_c[i] = gamma * theta_1[i] + np.sqrt(1 - gamma**2) * np.random.normal()
+    #     theta = theta_1[i]
+        
+    #     theta_tilde = gamma * theta + np.sqrt(1 - gamma**2) * np.random.normal()
+        
+    #     # Compute the ratio r = f(theta_tilde) / f(theta), 
+    #     # where f is the pdf of the Gaussian distribution
+    #     # f(x) = exp(-0.5 * x^2) / sqrt(2 * pi)
+    #     # r = exp(-0.5 * (theta_tilde**2 - theta**2))
+    #     r = exp(0.5 * (theta**2 - theta_tilde**2))
+        
+    #     if np.random.rand() < min(1, r):
+    #         theta_c[i] = theta_tilde
+    #     else:
+    #         theta_c[i] = theta
+    
     theta_c = gamma * theta_1 + np.sqrt(1 - gamma**2) * np.random.randn(M)
         
     # Solve the PDE for required mesh size
@@ -58,7 +72,7 @@ def sampling_theta_list(N, G, theta_ls, c_l, u_max, n_grid, gamma = 0.8):
     i = 0
     while i < N - N0:
         theta = theta_ls[i]
-        G_new, theta_new = sampling_one_new_theta(G, theta, c_l, u_max, n_grid, gamma)
+        G_new, theta_new = sampling_one_new_theta(G, theta, c_l, u_max, n_grid, gamma = gamma)
         G.append(G_new)
         theta_ls.append(theta_new)
         i += 1
@@ -84,7 +98,7 @@ def sampling_theta_burn_in(L_b, N, G, theta_ls, c_l, u_max, n_grid, gamma = 0.8)
     i = 0
     while i < N + (L_b - 1) * N0:
         theta = theta_ls[i]
-        G_new, theta_new = sampling_one_new_theta(G, theta, c_l, u_max, n_grid, gamma)
+        G_new, theta_new = sampling_one_new_theta(G, theta, c_l, u_max, n_grid, gamma = gamma)
         G.append(G_new)
         theta_ls.append(theta_new)
         i += 1
@@ -126,16 +140,16 @@ if __name__ == "__main__":
     thetas_list = [thetas]
     
     for i in range(N):
-        G_new, thetas = sampling_one_new_theta(G, thetas_list[i], 0.1, u_max, n_grid, gamma)
+        G_new, thetas = sampling_one_new_theta(G, thetas_list[i], 0.3, u_max, n_grid, gamma)
         G.append(G_new)
         thetas_list.append(thetas)
         
-    G, thetas_list, c_l = compute_cl(G, thetas_list, N, 0.1, 0, 6)
+    G, thetas_list, c_l = compute_cl(G, thetas_list, N, 0.3, 0, 6)
     
     print('c_0=', c_l)
     
     # Sample from the posterior distribution
-    G, thetas_list = sampling_theta_list(N, G, thetas_list, c_l, u_max, n_grid, gamma)
+    G, thetas_list = sampling_theta_list(N, G, thetas_list, c_l, u_max, n_grid, gamma = gamma)
     
     print('G =', len(G))
     print('thetas =', len(thetas_list))
@@ -144,6 +158,6 @@ if __name__ == "__main__":
     
     print('c_1=', c_l)
     
-    G, thetas_list = sampling_theta_burn_in(10, N, G, thetas_list, u_max, c_l, gamma)
+    G, thetas_list = sampling_theta_burn_in(10, N, G, thetas_list, c_l, u_max, n_grid, gamma = gamma)
     
     print('G =', len(G))
