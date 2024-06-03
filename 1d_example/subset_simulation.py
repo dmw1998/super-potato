@@ -34,7 +34,7 @@ def subset_simulation(N, M, p0, u_max, n_grid, gamma = 0.8, L = 5):
     for i in range(N):
         thetas = np.random.normal(0, 1, M)
         theta_ls.append(thetas)
-        u_1 = IoQ(kl_expan_sus(thetas), n_grid)
+        u_1 = IoQ(kl_expan(thetas), n_grid)
         g = u_max - u_1
         G.append(g)
     
