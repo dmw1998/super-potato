@@ -16,3 +16,12 @@ def y_l(L, gamma):
         y[l] = (gamma ** l + gamma ** (l+1)) + y[l+1]
         
     return y
+
+if __name__ == "__main__":
+    L = 5
+    
+    for i in range(100):
+        gamma = 0.01 * i
+        y = y_l(L, gamma)
+        print("gamma: ", gamma)
+        print("y: ", y)
