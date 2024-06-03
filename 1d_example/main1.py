@@ -36,9 +36,9 @@ def main(L_b, N, M, p0, u_max, n_grid, gamma = 0.8, L = 5):
         u_1 = IoQ(kl_expan(thetas), n_grid)
         g = u_max - u_1
         G0.append(g)
-        u_1 = IoQ(kl_expansion_corr(thetas), n_grid)
-        g = u_max - u_1
-        G1.append(g)
+        # u_1 = IoQ(kl_expansion_corr(thetas), n_grid)
+        # g = u_max - u_1
+        # G1.append(g)
     
     # For subset simulation with fully refinement
     G = G0
@@ -71,7 +71,7 @@ def main(L_b, N, M, p0, u_max, n_grid, gamma = 0.8, L = 5):
         p_f_sub *= len(G) / N
     
     # For multilevel estimator
-    G = G1
+    G = G0
     theta_ls = theta_ls0
     p0 = 0.25
     L = 7
@@ -139,6 +139,7 @@ if __name__ == "__main__":
     
     print("")
     
+    np.random.seed(1)
     p_f_sub, p_f_mle = main(L_b, N, M, p0, u_max, n_grid)
     print("The probability of failure by subset simulation is: {:.2e}".format(p_f_sub))
     print("The probability of failure by multilevel estimator is: {:.2e}".format(p_f_mle)
