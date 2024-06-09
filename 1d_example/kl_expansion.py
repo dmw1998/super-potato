@@ -53,6 +53,50 @@ def kl_expan(thetas):
     return a_x
 
 
+def kl_expan_1(thetas):
+    """
+    Compute the KL expansion for the log-normal random field.
+
+    Args:
+    thetas (numpy.ndarray): Array of length M, the KL expansion coefficients.
+
+    Returns:
+    a_x (numpy.ndarray): Array of length n, the random field values at the spatial points.
+    """
+    
+    M = len(thetas)  # Number of KL terms
+    
+    # Define the spatial domain
+    x = np.linspace(0, 1, 1000)  # Spatial grid points
+    
+    # Define the KL eigenvalues and eigenfunctions for the exponential-type correlation function
+    beta = 1 / 0.01
+    
+    def eigenvalue(m):
+        w = m * np.pi
+        return 2 * beta / (w**2 + beta**2)
+    
+    def eigenfunction(m, x):
+        w = m * np.pi
+        return np.sqrt(2) * np.sin(w * x)
+    
+    # Compute the mean and standard deviation for log-normal distribution
+    mu_a = 1
+    sigma_a = 0.1
+    mu = np.log(mu_a**2 / np.sqrt(mu_a**2 + sigma_a**2))
+    sigma = np.sqrt(np.log(1 + (sigma_a**2 / mu_a**2)))
+    
+    # Compute the log-normal random field log(a(x))
+    log_a_x = mu + sigma * sum(
+        np.sqrt(eigenvalue(m + 1)) * eigenfunction(m + 1, x) * thetas[m] for m in range(M)
+    )
+
+    # Convert to the actual random field a(x)
+    a_x = np.exp(log_a_x)
+    
+    return a_x
+
+
 def kl_expansion_corr(thetas):
     # input:
     # thetas: a numpy array of length M
@@ -96,7 +140,7 @@ if __name__ == "__main__":
     # Define the correlation length
     l_c = 0.01
     
-    M = 10
+    M = 150
     
     # Define the KL coefficients
     np.random.seed(0)
