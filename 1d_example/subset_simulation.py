@@ -19,8 +19,7 @@ def subset_simulation(N, M, p0, u_max, n_grid, gamma = 0.8, L = 5):
     # L: number of levels
     
     # output:
-    # theta_ls: samples
-    # G: approximated IoQ
+    # p_f: failure probability
     
     # Initialize the list of the approximated IoQ
     G = []
@@ -63,7 +62,23 @@ def subset_simulation(N, M, p0, u_max, n_grid, gamma = 0.8, L = 5):
     
     return p_f * len(G) / N
 
+def bootstrap_confidence_interval(data, num_bootstrap_samples=1000, confidence_level=0.95):
+    n = len(data)
+    bootstrap_samples = np.random.choice(data, size=(num_bootstrap_samples, n), replace=True)
+    bootstrap_estimates = np.mean(bootstrap_samples, axis=1)
+    
+    lower_percentile = (1.0 - confidence_level) / 2.0 * 100
+    upper_percentile = (1.0 + confidence_level) / 2.0 * 100
+    
+    lower_bound = np.percentile(bootstrap_estimates, lower_percentile)
+    upper_bound = np.percentile(bootstrap_estimates, upper_percentile)
+    
+    return lower_bound, upper_bound
+
 if __name__ == "__main__":
+    # Define the number of simulations
+    num_simulations = 100
+    
     # Define the number of samples
     N = 100
     
@@ -83,25 +98,33 @@ if __name__ == "__main__":
     gamma = 0.8
     
     # Define the number of levels
-    L = 4
-    
-    # np.random.seed(0)
-    # # Compute the probability of failure
-    # p_f = subset_simulation(N, M, p0, u_max, n_grid, gamma, L)
-    # print("The probability of failure is: {:.2e}".format(p_f))
+    L = 5
     
     np.random.seed(0)
-    runs = 10
-    p_f = np.zeros(runs)
-    for i in range(0, runs):
-        # print("Seed: ", i)
-        # np.random.seed(i)
-        # Compute the probability of failure
-        p_f[i] = subset_simulation(N, M, p0, u_max, n_grid, gamma, L)
-        print("The probability of failure is: {:.2e}".format(p_f[i]))
-        
-        # print("")
+    # Compute the probability of failure
+    p_f = subset_simulation(N, M, p0, u_max, n_grid, gamma, L)
+    print("The probability of failure is: {:.2e}".format(p_f))
     
-    # save p_f
-    # np.save("p_f.npy", p_f)
-    print("The mean of the probability of failure is: {:.2e}".format(np.mean(p_f)))
+    # np.random.seed(0)
+    # runs = 10
+    # p_f = np.zeros(runs)
+    # for i in range(0, runs):
+    #     # print("Seed: ", i)
+    #     # np.random.seed(i)
+    #     # Compute the probability of failure
+    #     p_f[i] = subset_simulation(N, M, p0, u_max, n_grid, gamma, L)
+    #     print("The probability of failure is: {:.2e}".format(p_f[i]))
+        
+    #     # print("")
+    
+    # # save p_f
+    # # np.save("p_f.npy", p_f)
+    # print("The mean of the probability of failure is: {:.2e}".format(np.mean(p_f)))
+    
+    failure_probabilities = [subset_simulation(N, M, p0, u_max, n_grid, gamma, L) for _ in range(num_simulations)]
+    # print("Failure probabilities:", failure_probabilities[0:10])
+
+    # Calculate 95% confidence interval using bootstrap method
+    confidence_interval = bootstrap_confidence_interval(failure_probabilities, num_bootstrap_samples=100, confidence_level=0.95)
+
+    print("95% confidence interval for failure probability:", confidence_interval)
