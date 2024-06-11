@@ -99,6 +99,9 @@ def main(L_b, N, M, p0, u_max, n_grid, gamma = 0.8, L = 5):
     denominator *= len([g for g in G_ if g <= c_l_1]) / N
     # print('denominator =', denominator)
     
+    if c_l < 0:
+        return p0 * len(G) / N / denominator
+    
     n_grid *= 2
     
     # l > 2, set L_b = L_b
