@@ -114,7 +114,7 @@ def i_0(mask):
     return -1
 
 L = 5
-y = y_l(0.002, L, 0.13)  # Adjusted final threshold
+y = y_l(-0.01, L, 0.13)  # Adjusted final threshold
 print(y)
 
 N_initial = 10  # Increase initial sample size for better initial estimate
@@ -130,7 +130,7 @@ while delta > 10e-6:
     for _ in range(N_1 - len(theta_ls)):  # Ensure we generate N_1 samples
         theta_0 = np.random.normal(0, 1, 150)
         g_0 = find_IoQ(theta_0)
-        print("IoQ:", g_0)
+        # print("IoQ:", g_0)
         theta_ls.append(theta_0)
         G.append(g_0)
     
@@ -155,6 +155,10 @@ for l in range(1, L):
         G = [G[i0]]
         delta = 10e6
         while delta > 10e-6:
+            
+            if i > 2000:
+                break 
+            
             for _ in range(N_l - len(theta_ls)):  # Ensure we generate N_l samples
                 theta_i = sample_theta(theta_ls[0], y[l])
                 g_i = find_IoQ(theta_i)
@@ -162,11 +166,11 @@ for l in range(1, L):
                 G.append(g_i)
                 
             mask = [g < y[l] for g in G]
-            print("mask: ", mask)
+            # print("mask: ", mask)
             p_l = sum(mask) / N_l
             
             delta = rRMSE(p_l, mask, N_l)
-            print("Level: ", l+1, "Iteration: ", i, "p_l: ", p_l, "delta: ", delta)
+            # print("Level: ", l+1, "Iteration: ", i, "p_l: ", p_l, "delta: ", delta)
             i += 1
         
         N_l *= N_increase_factor  # Increase the number of samples for the next level if needed
