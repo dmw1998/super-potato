@@ -41,10 +41,14 @@ def mle(p0, N, M, L_b, u_max = 0.535, n_grid = 4, L = 5):
     G, theta_ls = sampling_theta_list(N, G, theta_ls, c_l, u_max, n_grid, gamma = 0.8)
     G, theta_ls, c_l = compute_cl(G, theta_ls, N, p0, 1, L)
     print('c_2 = ', c_l)
+    
     G_, _ = sampling_theta_list(N, G, theta_ls, c_l, u_max, n_grid, gamma = 0.8)
     
     denominator *= len([g for g in G_ if g <= c_l_1]) / N
     # print('denominator =', denominator)
+    
+    if c_l < 0:
+        return p0 * len(G) / N / denominator
     
     n_grid *= 2
     
@@ -72,17 +76,23 @@ def mle(p0, N, M, L_b, u_max = 0.535, n_grid = 4, L = 5):
 
 if __name__ == "__main__":
     p0 = 0.25
-    N = 1000
+    N = 100
     M = 150
     L_b = 10
     u_max = 0.535
-    n_grid = 4
-    L = 7
-    
-    np.random.seed(0)
-    p_f = mle(p0, N, M, L_b, u_max, n_grid, L)
-    print("The probability of failure is: {:.2e}".format(p_f))
+    n_grid = 32
+    L = 8
     
     np.random.seed(1)
     p_f = mle(p0, N, M, L_b, u_max, n_grid, L)
     print("The probability of failure is: {:.2e}".format(p_f))
+    
+    from subset_simulation import bootstrap_confidence_interval
+    
+    failure_probabilities = [mle(p0, N, M, L_b, u_max, n_grid, L) for _ in range(10)]
+    print("Failure probabilities:", failure_probabilities)
+
+    # Calculate 95% confidence interval using bootstrap method
+    confidence_interval = bootstrap_confidence_interval(failure_probabilities, num_bootstrap_samples=100, confidence_level=0.95)
+
+    print("95% confidence interval for failure probability:", confidence_interval)
