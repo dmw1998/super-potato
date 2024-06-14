@@ -105,7 +105,7 @@ if __name__ == "__main__":
     y = y_l(L, gamma)
     # print("y: ", y)
     
-    np.random.seed(0)
+    np.random.seed(42)
     s, p_f = subset_simulation_yl(N, M, u_max, n_grid, gamma, corr_coeff, L)
     print("failure probability  {:.2e}".format(p_f))
     s = False
