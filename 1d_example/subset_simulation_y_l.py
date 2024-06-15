@@ -98,12 +98,12 @@ if __name__ == "__main__":
     M = 150
     u_max = 0.535
     n_grid = 100
-    gamma = 0.13
+    gamma = 0.15
     corr_coeff = 0.8
     L = 5
     
     y = y_l(L, gamma)
-    # print("y: ", y)
+    print("y: ", y)
     
     np.random.seed(42)
     s, p_f = subset_simulation_yl(N, M, u_max, n_grid, gamma, corr_coeff, L)
@@ -130,16 +130,16 @@ if __name__ == "__main__":
 
     print("95% confidence interval for failure probability:", confidence_interval)
     
-    p_f = sorted(p_f)
-    cdf = np.arange(1, len(p_f) + 1) / len(p_f)
+    # p_f = sorted(p_f)
+    # cdf = np.arange(1, len(p_f) + 1) / len(p_f)
 
-    # Step 3: Plot the empirical CDF
-    plt.figure(figsize=(8, 6))
-    plt.xscale("log")
-    plt.xlim(1e-5, 1e-3)
-    plt.step(p_f, cdf, where='post')
-    plt.xlabel('Probability')
-    plt.ylabel('Empirical CDF')
-    plt.title('Empirical CDF of Probabilities')
-    plt.grid(True)
-    plt.show()
+    # # Step 3: Plot the empirical CDF
+    # plt.figure(figsize=(8, 6))
+    # plt.xscale("log")
+    # plt.xlim(1e-5, 1e-3)
+    # plt.step(p_f, cdf, where='post')
+    # plt.xlabel('Probability')
+    # plt.ylabel('Empirical CDF')
+    # plt.title('Empirical CDF of Probabilities')
+    # plt.grid(True)
+    # plt.show()
