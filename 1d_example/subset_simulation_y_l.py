@@ -83,7 +83,7 @@ def subset_simulation_yl(N, M, u_max, n_grid, gamma, corr_coeff = 0.8, L = 5):
             k += 1
             # print("Zero probability of failure at level:", l, "i:", k)
             
-            if k > 2000:
+            if k > 200:
                 s = False
                 print("Zero probability of failure at level:", l, "i:", k)
                 break
@@ -98,9 +98,9 @@ if __name__ == "__main__":
     M = 150
     u_max = 0.535
     n_grid = 100
-    gamma = 0.5
+    gamma = 0.3
     corr_coeff = 0.8
-    L = 15
+    L = 10
     
     y = y_l(L, gamma)
     print("y: ", y)
