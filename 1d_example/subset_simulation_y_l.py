@@ -83,10 +83,10 @@ def subset_simulation_yl(N, M, u_max, n_grid, gamma, corr_coeff = 0.8, L = 5):
             k += 1
             # print("Zero probability of failure at level:", l, "i:", k)
             
-            if k > 200:
+            if k > 1000:
                 s = False
                 print("Zero probability of failure at level:", l, "i:", k)
-                break
+                return s, p_f
         
         # print("prob at", l+1, "is", len(G) / N)
         p_f *= len(G) / N
@@ -94,18 +94,18 @@ def subset_simulation_yl(N, M, u_max, n_grid, gamma, corr_coeff = 0.8, L = 5):
     return s, p_f
 
 if __name__ == "__main__":
-    N = 100
+    N = 50
     M = 150
     u_max = 0.535
     n_grid = 100
-    gamma = 0.3
+    gamma = 0.45
     corr_coeff = 0.8
-    L = 10
+    L = 15
     
     y = y_l(L, gamma)
     print("y: ", y)
     
-    np.random.seed(42)
+    np.random.seed(0)
     s, p_f = subset_simulation_yl(N, M, u_max, n_grid, gamma, corr_coeff, L)
     print("failure probability  {:.2e}".format(p_f))
     s = False
@@ -130,16 +130,16 @@ if __name__ == "__main__":
 
     print("95% confidence interval for failure probability:", confidence_interval)
     
-    # p_f = sorted(p_f)
-    # cdf = np.arange(1, len(p_f) + 1) / len(p_f)
+    p_f = sorted(p_f)
+    cdf = np.arange(1, len(p_f) + 1) / len(p_f) 
 
-    # # Step 3: Plot the empirical CDF
-    # plt.figure(figsize=(8, 6))
-    # plt.xscale("log")
-    # plt.xlim(1e-5, 1e-3)
-    # plt.step(p_f, cdf, where='post')
-    # plt.xlabel('Probability')
-    # plt.ylabel('Empirical CDF')
-    # plt.title('Empirical CDF of Probabilities')
-    # plt.grid(True)
-    # plt.show()
+    # Step 3: Plot the empirical CDF
+    plt.figure(figsize=(8, 6))
+    plt.xscale("log")
+    plt.xlim(1e-5, 1e-3)
+    plt.step(p_f, cdf, where='post')
+    plt.xlabel('Probability')
+    plt.ylabel('Empirical CDF')
+    plt.title('Empirical CDF of Probabilities')
+    plt.grid(True)
+    plt.show()
