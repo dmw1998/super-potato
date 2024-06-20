@@ -38,7 +38,7 @@ def subset_simulation(N, M, p0, u_max, n_grid, gamma = 0.8, L = 5):
         G.append(g)
     
     # Compute the threshold value
-    G, theta_ls, c_l = compute_cl(G, theta_ls, N, p0, 1, L)
+    G, theta_ls, c_l = compute_cl(G, theta_ls, N, p0, 0, L)
     
     # print("Level: 0", "Threshold value: ", c_l)
     
@@ -77,10 +77,10 @@ def bootstrap_confidence_interval(data, num_bootstrap_samples=1000, confidence_l
 
 if __name__ == "__main__":
     # Define the number of simulations
-    num_simulations = 100
+    num_simulations = 500
     
     # Define the number of samples
-    N = 100
+    N = 1000
     
     # Define the number of terms in the KL expansion
     M = 150
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     u_max = 0.535
     
     # Define the number of mesh points
-    n_grid = 100
+    n_grid = 512
     
     # Define the correlation parameter
     gamma = 0.8
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     # Define the number of levels
     L = 5
     
-    np.random.seed(0)
+    np.random.seed(1)
     # Compute the probability of failure
     p_f = subset_simulation(N, M, p0, u_max, n_grid, gamma, L)
     print("The probability of failure is: {:.2e}".format(p_f))
@@ -128,3 +128,17 @@ if __name__ == "__main__":
     confidence_interval = bootstrap_confidence_interval(failure_probabilities, num_bootstrap_samples=100, confidence_level=0.95)
 
     print("95% confidence interval for failure probability:", confidence_interval)
+    
+    p_f = sorted(failure_probabilities)
+    cdf = np.arange(1, len(p_f) + 1) / len(p_f) 
+
+    # Step 3: Plot the empirical CDF
+    plt.figure(figsize=(8, 6))
+    plt.xscale("log")
+    plt.xlim(1e-5, 1e-3)
+    plt.step(p_f, cdf, where='post')
+    plt.xlabel('Probability')
+    plt.ylabel('Empirical CDF')
+    plt.title('Empirical CDF of Probabilities')
+    plt.grid(True)
+    plt.show()

@@ -76,23 +76,37 @@ def mle(p0, N, M, L_b, u_max = 0.535, n_grid = 4, L = 5):
 
 if __name__ == "__main__":
     p0 = 0.25
-    N = 100
+    N = 1000
     M = 150
     L_b = 10
     u_max = 0.535
-    n_grid = 32
+    n_grid = 4
     L = 8
     
-    np.random.seed(1)
+    np.random.seed(0)
     p_f = mle(p0, N, M, L_b, u_max, n_grid, L)
     print("The probability of failure is: {:.2e}".format(p_f))
     
     from subset_simulation import bootstrap_confidence_interval
     
-    failure_probabilities = [mle(p0, N, M, L_b, u_max, n_grid, L) for _ in range(10)]
+    failure_probabilities = [mle(p0, N, M, L_b, u_max, n_grid, L) for _ in range(100)]
     print("Failure probabilities:", failure_probabilities)
 
     # Calculate 95% confidence interval using bootstrap method
     confidence_interval = bootstrap_confidence_interval(failure_probabilities, num_bootstrap_samples=100, confidence_level=0.95)
 
     print("95% confidence interval for failure probability:", confidence_interval)
+    
+    p_f = sorted(failure_probabilities)
+    cdf = np.arange(1, len(p_f) + 1) / len(p_f) 
+
+    # Step 3: Plot the empirical CDF
+    plt.figure(figsize=(8, 6))
+    plt.xscale("log")
+    # plt.xlim(1e-5, 1e-3)
+    plt.step(p_f, cdf, where='post')
+    plt.xlabel('Probability')
+    plt.ylabel('Empirical CDF')
+    plt.title('Empirical CDF of Probabilities')
+    plt.grid(True)
+    plt.show()

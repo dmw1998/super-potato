@@ -94,13 +94,13 @@ def subset_simulation_yl(N, M, u_max, n_grid, gamma, corr_coeff = 0.8, L = 5):
     return s, p_f
 
 if __name__ == "__main__":
-    N = 50
+    N = 1000
     M = 150
     u_max = 0.535
-    n_grid = 100
-    gamma = 0.45
+    n_grid = 512
+    gamma = 0.13
     corr_coeff = 0.8
-    L = 15
+    L = 5
     
     y = y_l(L, gamma)
     print("y: ", y)
@@ -109,8 +109,8 @@ if __name__ == "__main__":
     s, p_f = subset_simulation_yl(N, M, u_max, n_grid, gamma, corr_coeff, L)
     print("failure probability  {:.2e}".format(p_f))
     s = False
-    p_f = np.zeros(100)
-    for i in range(100):
+    p_f = np.zeros(500)
+    for i in range(500):
         ind = i
         while True:
             s, p = subset_simulation_yl(N, M, u_max, n_grid, gamma, corr_coeff, L)
