@@ -89,8 +89,7 @@ def IoQ(a_x, n_grid):
     v = TestFunction(V)
     f = Constant(1.0)
     
-    # a_form = inner(a * u.dx(0), v.dx(0)) * dx
-    a_form = inner(a * grad(u), grad(v)) * dx
+    a_form = inner(a * u.dx(0), v.dx(0)) * dx
     L = f * v * dx
     
     # Set PETSc options to suppress solver output
@@ -102,67 +101,32 @@ def IoQ(a_x, n_grid):
     set_log_level(LogLevel.ERROR)  # Suppress the FEniCS log messages
     solve(a_form == L, u_h, bc)
     
-    return u_h(1)
-
-# To define the failure domain
-def failure_level(G, thetas_ls, N, l, p0 = 0.1, L = 6):
-    # input:
-    # G: approximated IoQ
-    # thetas_ls: list of thetas
-    # N: number of samples
-    # p0: failure probability
-    # L: number of levels
-    
-    # output:
-    # G, thetas_ls: updated G and thetas_ls
-    # c_l: failure level
-    
-    # # To gain more faster convergence rate, first find the minimum value and index of G
-    # G_min, G_min_index = min((G[i], i) for i in range(N))
-    # thetas_min = thetas_ls[G_min_index]
-    
-    # if G_min >= 0:
-    #     c_l = G_min
-    #     G = [G_min]
-    #     thetas_ls = [thetas_min]
-    #     return G, thetas_ls, c_l
-    # Not a good idea
-    
-    sorted_indices = sorted(range(N), key=lambda k: G[k])
-    sorted_G = [G[i] for i in sorted_indices]
-    sorted_theta_ls = [thetas_ls[i] for i in sorted_indices]
-    
-    N0 = int(p0 * N)
-    c_l = sorted_G[N0-1]
-    if c_l < 0 or l == L:
-        # When we reach the finest level
-        G = [g for g in G if g < 0]
-    else:
-        G = sorted_G[:N0]
-        thetas_ls = sorted_theta_ls[:N0]
-    
-    return G, thetas_ls, c_l
+    return u_h
     
 
 if __name__ == '__main__':
     import numpy as np
+    import matplotlib.pyplot as plt
     u_max = 0.535
-    N = 10
+    N = 100
     M = 150
     n_grid = 400
     p0 = 0.1
     G = np.empty(N)
     thetas_list = np.empty((N, M))
     
+    fig, ax = plt.subplots()
+    ax.set_xlabel('x')
+    ax.set_ylabel('u')
+    ax.grid()
+    
     for i in range(N):
         thetas = np.random.normal(0, 1, M)
         u_1 = IoQ(kl_expan_2(thetas), n_grid)
-        g = u_max - u_1
-        G[i] = g
-        thetas_list[i] = thetas
-        
-    print('G =', G)    
-    G, thetas, c_l = failure_level(G, thetas_list, N, p0)
-    print('G =', G)
-    print('c_l =', c_l)
-    print("failure probability:", len(G) / N)
+        # Plot u_1
+        plot(u_1, alpha=0.5)
+
+    ax.axhline(y=u_max, color='r', linestyle='--', label='u_max')
+    plt.ylim(0, u_max + 0.05)
+    plt.legend()
+    plt.show()
