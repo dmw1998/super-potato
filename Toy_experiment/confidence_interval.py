@@ -14,7 +14,7 @@ def bootstrap_confidence_interval(data, num_bootstrap_samples=1000):
     lower_bound_95 = np.percentile(bootstrap_estimates, lower_percentile)
     upper_bound_95 = np.percentile(bootstrap_estimates, upper_percentile)
     
-    lower_bound_90 = np.percentile(bootstrap_estimates, upper_percentile_90)
-    upper_bound_90 = np.percentile(bootstrap_estimates, lower_percentile_90)
+    lower_bound_90 = np.percentile(bootstrap_estimates, lower_percentile_90)
+    upper_bound_90 = np.percentile(bootstrap_estimates, upper_percentile_90)
     
     return (lower_bound_95, upper_bound_95), (lower_bound_90, upper_bound_90)
