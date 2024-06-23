@@ -24,10 +24,10 @@ def Generate_G_l(G_l, kappa, N, l, c_l, gamma = 0.5):
         G_l_new += kappa_new * (gamma ** l)
         
         if G_l_new <= c_l:
-            kappa = np.append(kappa, kappa_new)
+            # kappa = np.append(kappa, kappa_new)
             G_l = np.append(G_l, G_l_new)
         else:
-            kappa = np.append(kappa, kappa[i])
+            # kappa = np.append(kappa, kappa[i])
             G_l = np.append(G_l, G_l[i])
         
     return G_l, kappa
@@ -96,6 +96,7 @@ def sample_new_G(G_l, N, l, c_l, gamma = 0.5):
     mask = G_l <= c_l
     
     while np.sum(mask) < N:
+        G_l = G_l[mask]
         G = np.random.normal(0, 1, N-N0)
         kappa = np.random.choice([-1, 1], N-N0)
         G_l = np.append(G_l, G + kappa * (gamma ** l))
