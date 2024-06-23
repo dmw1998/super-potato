@@ -3,10 +3,9 @@
 
 import numpy as np
 
-def Generate_G_l(G_l, kappa, N, l, c_l, gamma = 0.5):
+def Generate_G_l(G_l, N, l, c_l, gamma = 0.5):
     # input:
     # G_l: samples in failure domain
-    # kappa: samples in failure domain
     # l: current level
     # c_l: probability threshold for each subset
     # gamma: auto-correlation factor
@@ -16,7 +15,6 @@ def Generate_G_l(G_l, kappa, N, l, c_l, gamma = 0.5):
     # kappa: new samples for next level
     
     N0 = len(G_l)
-    # G_l = G_l - kappa * (gamma ** (l-1)) + kappa * (gamma ** l)
     
     for i in range(N - N0):
         G_l_new = 0.8 * G_l[i]  + np.sqrt(1 - 0.8 ** 2) * np.random.normal(0, 1)
@@ -24,13 +22,11 @@ def Generate_G_l(G_l, kappa, N, l, c_l, gamma = 0.5):
         G_l_new += kappa_new * (gamma ** l)
         
         if G_l_new <= c_l:
-            # kappa = np.append(kappa, kappa_new)
             G_l = np.append(G_l, G_l_new)
         else:
-            # kappa = np.append(kappa, kappa[i])
             G_l = np.append(G_l, G_l[i])
         
-    return G_l, kappa
+    return G_l
 
 def modified_metropolis_hastings(G_l, kappa, N, l, c_l, gamma = 0.5,  proposal_std=0.8):
     # input:
@@ -62,20 +58,20 @@ def modified_metropolis_hastings(G_l, kappa, N, l, c_l, gamma = 0.5,  proposal_s
         # Accept or reject the new sample
         if np.random.uniform(0, 1) > acceptance_ratio:
             G_new = G_l[i]
-            kappa_new = kappa[i]
             
         # Compute the new G_l
         G_l_new = G_new + kappa_new * (gamma ** l)
         
         # Accept or reject the new sample
         if G_l_new <= c_l:
-            kappa = np.append(kappa, kappa_new)
             G_l = np.append(G_l, G_l_new)
         else:
-            kappa = np.append(kappa, kappa[i])
             G_l = np.append(G_l, G_l[i])
         
-    return G_l, kappa
+    return G_l
+
+def k(w):
+        return 0.5 if -1 <= w <= 1 else 0
 
 def sample_new_G(G_l, N, l, c_l, gamma = 0.5):
     # input:
@@ -85,23 +81,16 @@ def sample_new_G(G_l, N, l, c_l, gamma = 0.5):
     # G_l: new samples for next level
     
     N0 = len(G_l)
-    # for i in range(N - N0):
-    #     g = np.random.normal(0, 1) + np.random.choice([-1,1]) * (gamma ** l)
-        
-    #     if g <= c_l:
-    #         G_l = np.append(G_l, g)
-    #     else:
-    #         G_l = np.append(G_l, G_l[i])
     
-    mask = G_l <= c_l
-    
-    while np.sum(mask) < N:
-        G_l = G_l[mask]
-        G = np.random.normal(0, 1, N-N0)
-        kappa = np.random.choice([-1, 1], N-N0)
-        G_l = np.append(G_l, G + kappa * (gamma ** l))
+    for i in range(N - N0):
+        G_new = 0.8 * G_l[i] + np.sqrt(1 - 0.8 ** 2) * np.random.normal(0, 1)
+        kappa_new = k(G_new)
+        G_l_new = G_new + kappa_new * gamma ** l
         
-        mask = G_l <= c_l
+        if G_l_new <= c_l:
+            G_l = np.append(G_l, G_l_new)
+        else:
+            G_l = np.append(G_l, G_l[i])
             
     return G_l
 
