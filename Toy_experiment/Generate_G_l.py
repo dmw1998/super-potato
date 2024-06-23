@@ -83,8 +83,11 @@ def sample_new_G(G_l, N, l, c_l, gamma = 0.5):
     N0 = len(G_l)
     
     for i in range(N - N0):
+        # Propose a new sample for G ~ N(0,1)
         G_new = 0.8 * G_l[i] + np.sqrt(1 - 0.8 ** 2) * np.random.normal(0, 1)
+        # Propose a new noise for kappa ~ U({-1, 1})
         kappa_new = k(G_new)
+        # Compute the new G_l
         G_l_new = G_new + kappa_new * gamma ** l
         
         if G_l_new <= c_l:

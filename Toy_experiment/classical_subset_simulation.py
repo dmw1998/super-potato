@@ -59,7 +59,7 @@ def classical_subset_simulation(N, y_L = -3.8, p0 = 0.1, gamma = 0.5, L = 5):
 
 if __name__ == "__main__":
     N = 1000  # Total number of samples per level
-    p_0 = 0.1  # Probability threshold for each subset, 0.15^5 = 7.59e-05
+    p_0 = 0.1  # Probability threshold for each subset
     gamma = 0.5
     L = 5  # Total number of levels
     y_L = -3.8  # Failure threshold
