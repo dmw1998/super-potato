@@ -64,6 +64,7 @@ def subset_simulation_sr(L, gamma, y_L, N):
             
             if mask.sum() > 0:
                 p_f *= mask.mean()
+                G_l = G_l[:1]
                 break
                 
     return p_f
@@ -74,7 +75,7 @@ if __name__ == "__main__":
     y_L = -3.8
     N = 1000
     
-    np.random.seed(0)
+    np.random.seed(1)
     
     failure_probabilities = [subset_simulation_sr(L, gamma, y_L, N) for _ in range(1000)]
     print("The mean of the failure probability: ", np.mean(failure_probabilities))
