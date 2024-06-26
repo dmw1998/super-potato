@@ -82,6 +82,10 @@ def sample_new_G(G_l, N, l, c_l, gamma = 0.5):
     
     N0 = len(G_l)
     
+    if N0 == 0:
+        G_l = np.random.normal(0, 1, N)
+        N0 = 1
+    
     for i in range(N - N0):
         # Propose a new sample for G ~ N(0,1)
         G_new = 0.8 * G_l[i] + np.sqrt(1 - 0.8 ** 2) * np.random.normal(0, 1)
