@@ -76,8 +76,9 @@ if __name__ == "__main__":
     N = 1000
     
     np.random.seed(1)
-    
+    start = time.time()
     failure_probabilities = [subset_simulation_sr(L, gamma, y_L, N) for _ in range(1000)]
+    print("Time: ", time.time() - start)
     print("The mean of the failure probability: ", np.mean(failure_probabilities))
     
     from confidence_interval import bootstrap_confidence_interval
