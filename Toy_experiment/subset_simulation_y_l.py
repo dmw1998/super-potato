@@ -93,4 +93,7 @@ if __name__ == "__main__":
     plt.grid(True)
     plt.show()
 
-        
+    # Time:  20.475760459899902
+    # The mean of the failure probability:  7.246777145475102e-05
+    # 95% confidence interval for failure probability: (7.11e-05, 7.39e-05)
+    # 90% confidence interval for failure probability: (7.13e-05, 7.37e-05)
