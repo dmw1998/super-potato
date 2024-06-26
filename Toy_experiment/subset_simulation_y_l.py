@@ -1,4 +1,6 @@
 # Solve the toy experiment using the subset simulation method with the selective refinement.
+# Given y_l list
+# one sample per iteration
 
 import numpy as np
 import time
@@ -6,8 +8,9 @@ import matplotlib.pyplot as plt
 
 from genrate_y_l import y_l
 from Generate_G_l import *
+from adaptive_multilevel_subset_simulation import rRMSE
 
-def subset_simulation_sr(L, gamma, y_L, N):
+def adaptive_subset_simulation_sr(L, gamma, y_L, N):
     # input:
     # L: number of levels
     # gamma: accuracy parameter s.t. |G - G_l| <= gamma^{l}
@@ -16,12 +19,10 @@ def subset_simulation_sr(L, gamma, y_L, N):
     
     # output:
     # p_f: the probability of failure
-    # p_f_hat: the probability of failure estimated by the subset simulation
-    # p_f_hat_sr: the probability of failure estimated by the subset simulation with the selective refinement
     
     # To compute the sequence of failure thresbolds y_l
-    # from genrate_y_l import y_l
     y = [-1.3, -2, -2.8, -3.3, y_L]
+    # y = y_l(gamma, y_L, L)
     
     # To generate the samples
     while True:
@@ -30,33 +31,14 @@ def subset_simulation_sr(L, gamma, y_L, N):
         G_l = G + kappa * gamma
         
         mask = G_l <= y[0]
-        # print(mask.sum())
         
         if mask.sum() > 0:
             p_f = mask.mean()
-            G_l = G_l[mask][:1]
+            G_l = G_l[mask]
             break
         
-    # for l in range(1, L+1):
-    #     i = 0
-    #     while i < 5000:
-    #         i += 1
-    #         G_l = sample_new_G(G_l, N, l, y[l-1], gamma)
-            
-    #         mask = G_l <= y[l]
-    #         # print(mask.sum())
-            
-    #         if mask.sum() > 0:
-    #             p_f *= mask.mean()
-    #             G_l = G_l[mask][:1]
-    #             break
-            
-    #     print("Level: ", l, "Number of iterations: ", i)
-    
     for l in range(1, L):
         while True:
-            # print("Level: ", l+1)
-            # time.sleep(0.5)
             G_l = sample_new_G(G_l, N, l+1, y[l-1], gamma)
             
             mask = G_l <= y[l]
@@ -64,20 +46,22 @@ def subset_simulation_sr(L, gamma, y_L, N):
             
             if mask.sum() > 0:
                 p_f *= mask.mean()
-                G_l = G_l[:1]
                 break
-                
+        
     return p_f
 
 if __name__ == "__main__":
     L = 5
-    gamma = 0.5
+    gamma = 0.1
     y_L = -3.8
     N = 1000
     
+    # p_f = adaptive_subset_simulation_sr(L, gamma, y_L, N)
+    # print("The probability of failure is: ", p_f)
+    
     np.random.seed(1)
     start = time.time()
-    failure_probabilities = [subset_simulation_sr(L, gamma, y_L, N) for _ in range(1000)]
+    failure_probabilities = [adaptive_subset_simulation_sr(L, gamma, y_L, N) for _ in range(1000)]
     print("Time: ", time.time() - start)
     print("The mean of the failure probability: ", np.mean(failure_probabilities))
     
@@ -108,3 +92,5 @@ if __name__ == "__main__":
     plt.legend()
     plt.grid(True)
     plt.show()
+
+        
